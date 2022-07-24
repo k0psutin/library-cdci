@@ -6,7 +6,6 @@ on:
       - main
 
 jobs:
-  name: deploy to heroku
   needs: build
   deploy:
     runs-on: ubuntu-18.04

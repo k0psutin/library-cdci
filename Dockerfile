@@ -1,0 +1,10 @@
+FROM node:16.3.0-alpine
+
+WORKDIR /opt/app
+COPY /backend .
+
+ENV MONGODB_URI ${JWT_SECRET}
+ENV JWT_SECRET ${JWT_SECRET}
+ENV PORT ${PORT}
+
+ENTRYPOINT npm start

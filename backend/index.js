@@ -20,7 +20,7 @@ require('dotenv').config()
 
 const MONGODB_URI = process.env.MONGODB_URI
 const JWT_SECRET = process.env.JWT_SECRET
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 4000
 
 mongoose
   .connect(MONGODB_URI, {
@@ -99,8 +99,11 @@ const startServer = async () => {
     path: '/graphql',
   })
 
-  app.use(cors())
   app.use('/', express.static('build'))
+
+  app.use('/health', (req, res) => {
+    res.send('ok')
+  })
 
   httpServer.listen(PORT, () =>
     console.log(`Server is now running on http://localhost:${PORT}`)

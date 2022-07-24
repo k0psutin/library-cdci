@@ -13,18 +13,21 @@ jobs:
       - uses: actions/setup-node@v1
         with: 
           node-version: '16.3.0'
-      - name: compile frontend
+      - name: Compile frontend
         run: |
           cd frontend
           npm install
           cd ..
-      - name: compile backend
+      - name: Compile backend
         run: |
           cd backend 
           npm install
           npm run build
-          cd ..
-      - name: heroku login credentials
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Heroku login credentials
         run: |
           cat > ~/.netrc <<EOF
             machine api.heroku.com
@@ -37,25 +40,25 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-      - name: login to heroku
+      - name: Login to heroku
         run: |
           heroku container:login
-      - name: build docker image
+      - name: Build docker image
         run: |
           docker build --build-arg MONGODB_URI=$MONGODB_URI --build-arg JWT_SECRET=$JWT_SECRET -t "registry.heroku.com/$HEROKU_APP_NAME/web" .
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      - name: push docker image to heroku
+      - name: Push docker image to heroku
         run: |
           docker push registry.heroku.com/$HEROKU_APP_NAME/web
         env:
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      - name: release 
+      - name: Release 
         run: |
           heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
-      - name: health check
+      - name: Health check
         uses: jtalk/url-health-check-action@v2
         with:
           url: https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health

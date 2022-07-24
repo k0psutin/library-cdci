@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    name: build
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -24,17 +23,35 @@ jobs:
           cd backend 
           npm install
           npm run build
-  deploy:
-    runs-on: ubuntu-18.04
-    needs: build
-    steps:
-      - uses: actions/checkout@v2
+          cd ..
+      - name: heroku login credentials
+        run: |
+          cat > ~/.netrc <<EOF
+            machine api.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+            machine git.heroku.com
+              login $HEROKU_EMAIL
+              password $HEROKU_API_KEY
+          EOF
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+      - name: login to heroku
+        run: |
+          heroku container:login
       - name: build docker image
         run: |
-          docker build --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} -t "registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web" .
+          docker build --build-arg MONGODB_URI=$MONGODB_URI --build-arg JWT_SECRET=$JWT_SECRET -t "registry.heroku.com/$HEROKU_APP_NAME/web" .
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       - name: push docker image to heroku
         run: |
-          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+          docker push registry.heroku.com/$HEROKU_APP_NAME/web
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       - name: release 
         run: |
           heroku container:release web
@@ -43,4 +60,4 @@ jobs:
         with:
           url: https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health
           max-attempts: 3
-          retry-delay: 5s  
+          retry-delay: 5s

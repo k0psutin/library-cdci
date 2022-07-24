@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  needs: build
   deploy:
+    needs: build
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2

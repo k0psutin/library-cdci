@@ -54,7 +54,7 @@ jobs:
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       - name: release 
         run: |
-          heroku container:release web
+          heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
       - name: health check
         uses: jtalk/url-health-check-action@v2
         with:

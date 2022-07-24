@@ -1,35 +1,34 @@
-name: deploy
+name: CI/CD
 
 on:
-  workflow_run:
-    workflows: ['build']
-    types:
-      - completed
+  push:
+    branches:
+      - main
 
 jobs:
-  login:
+  build:
+    name: build
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - name: heroku login credentials
+      - uses: actions/setup-node@v1
+        with: 
+          node-version: '16.3.0'
+      - name: compile frontend
         run: |
-          cat > ~/.netrc <<EOF
-            machine api.heroku.com
-              login $HEROKU_EMAIL
-              password $HEROKU_API_KEY
-            machine git.heroku.com
-              login $HEROKU_EMAIL
-              password $HEROKU_API_KEY
-          EOF
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-      - name: login to heroku
+          cd frontend
+          npm install
+          cd ..
+      - name: compile backend
         run: |
-          heroku container:login
+          cd backend 
+          npm install
+          npm run build
   deploy:
     runs-on: ubuntu-18.04
+    needs: build
     steps:
+      - uses: actions/checkout@v2
       - name: build docker image
         run: |
           docker build --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} -t "registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web" .
@@ -44,6 +43,4 @@ jobs:
         with:
           url: https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health
           max-attempts: 3
-          retry-delay: 5s
-
-  
+          retry-delay: 5s  

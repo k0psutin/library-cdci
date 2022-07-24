@@ -1,13 +1,13 @@
 name: deploy
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ['build']
+    types:
+      - completed
 
 jobs:
-  deploy:
-    needs: build
+  login:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -24,14 +24,15 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
       - name: login to heroku
         run: |
           heroku container:login
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
       - name: build docker image
         run: |
-          docker build --build-arg MONGODB_URI=$MONGODB_URI --build-arg JWT_SECRET=$JWT_SECRET -t "registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web" .
+          docker build --build-arg MONGODB_URI=${{ secrets.MONGODB_URI }} --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} -t "registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web" .
       - name: push docker image to heroku
         run: |
           docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web

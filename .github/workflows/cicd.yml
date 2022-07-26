@@ -12,9 +12,9 @@ jobs:
   notify:
     runs-on: ubuntu-18.04
     steps:
-      - name: send telegram message on merge
       - uses: actions/chekcout@v2
-      - uses: appleboy/telegram-action@master
+      - name: send telegram message on merge
+        uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
@@ -59,23 +59,19 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
       - name: Login to heroku
-        run: |
-          heroku container:login
+        run: heroku container:login
       - name: Build docker image
-        run: |
-          docker build --build-arg MONGODB_URI=$MONGODB_URI --build-arg JWT_SECRET=$JWT_SECRET -t "registry.heroku.com/$HEROKU_APP_NAME/web" .
+        run: docker build --build-arg MONGODB_URI=$MONGODB_URI --build-arg JWT_SECRET=$JWT_SECRET -t "registry.heroku.com/$HEROKU_APP_NAME/web" .
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       - name: Push docker image to heroku
-        run: |
-          docker push registry.heroku.com/$HEROKU_APP_NAME/web
+        run: docker push registry.heroku.com/$HEROKU_APP_NAME/web
         env:
           HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       - name: Release 
-        run: |
-          heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
+        run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
   healthcheck:
     needs: deploy
     runs-on: ubuntu-18.04
@@ -92,9 +88,9 @@ jobs:
     runs-on: ubuntu-18.04
     if: ${{ success() }}
     steps:
-      - name: send telegram message on success
       - uses: actions/chekcout@v2
-      - uses: appleboy/telegram-action@master
+      - name: send telegram message on success
+        uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}

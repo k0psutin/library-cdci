@@ -115,6 +115,6 @@ jobs:
             Commit message: ${{ github.event.commits[0].message }}
             
             Deployment unsuccessful. Roll back initiated.
-      - name: roll back heroku -a ${{ secrets.HEROKU_APP_NAME }}
-        run: heroku rollback
+      - name: roll back heroku
+        run: heroku rollback -a ${{ secrets.HEROKU_APP_NAME }}
 

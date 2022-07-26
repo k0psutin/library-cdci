@@ -99,7 +99,7 @@ const startServer = async () => {
     path: '/graphql',
   })
 
-  app.use('/', express.static('build'))
+  //app.use('/', express.static('build'))
 
   app.use('/health', (req, res) => {
     res.send('ok')

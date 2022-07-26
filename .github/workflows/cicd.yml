@@ -4,8 +4,25 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 jobs:
+  notify:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: send telegram message on merge
+      - uses: actions/chekcout@v2
+      - uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} commit merged.
+            Commit message: ${{ github.event.commits[0].message }}
+            
+            Build started.
   build:
     runs-on: ubuntu-18.04
     steps:
@@ -59,9 +76,49 @@ jobs:
       - name: Release 
         run: |
           heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
+  healthcheck:
+    needs: deploy
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
       - name: Health check
         uses: jtalk/url-health-check-action@v2
         with:
           url: https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health
           max-attempts: 3
           retry-delay: 5s
+  finish:
+    needs: healthcheck
+    runs-on: ubuntu-18.04
+    if: ${{ success() }}
+    steps:
+      - name: send telegram message on success
+      - uses: actions/chekcout@v2
+      - uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} commit merged.
+            Commit message: ${{ github.event.commits[0].message }}
+            
+            Deployed successfully.
+  rollback:
+    needs: healthcheck
+    runs-on: ubuntu-18.04
+    if: ${{ failure() }}
+    steps:
+      - name: roll back heroku and notify
+      - uses: actions/checkout@v2
+      - uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} commit merged.
+            Commit message: ${{ github.event.commits[0].message }}
+            
+            Deployment unsuccessful. Roll back initiated.
+      - name: roll back heroku
+        run: heroku rollback
+

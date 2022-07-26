@@ -101,10 +101,6 @@ const startServer = async () => {
 
   app.use('/', express.static('build'))
 
-  app.use('/health', (req, res) => {
-    res.send('ok')
-  })
-
   httpServer.listen(PORT, () =>
     console.log(`Server is now running on http://localhost:${PORT}`)
   )

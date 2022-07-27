@@ -23,7 +23,7 @@ jobs:
             Commit message: ${{ github.event.commits[0].message }}
             
             Build started.
-  build:
+  deploy:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -40,11 +40,7 @@ jobs:
           cd backend 
           npm install
           npm run build
-  deploy:
-    needs: build
-    runs-on: ubuntu-18.04
-    steps:
-      - uses: actions/checkout@v2
+          cd ..
       - name: Heroku login credentials
         run: |
           cat > ~/.netrc <<EOF

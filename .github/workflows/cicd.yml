@@ -26,7 +26,6 @@ jobs:
             Build started.
   deploy:
     runs-on: ubuntu-18.04
-    if: ${{ !contains(github.event.head_commit.message, '#skip') }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1

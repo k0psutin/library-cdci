@@ -20,7 +20,7 @@ jobs:
             Commit message: ${{ github.event.commits[0].message }}
             
             Build started.
-  deploy:
+  lint:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2

@@ -1,0 +1,41 @@
+name: Pull request
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  notify:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: send telegram message on merge
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} opened a pull request.
+            Commit message: ${{ github.event.commits[0].message }}
+            
+            Build started.
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with: 
+          node-version: '16.3.0'
+      - name: Compile frontend and run lint
+        run: |
+          cd frontend
+          npm install
+          npm run lint
+          cd ..
+      - name: Compile backend and run lint
+        run: |
+          cd backend 
+          npm install
+          npm run lint
+          npm run build

@@ -11,6 +11,7 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-18.04
+    if: ${{ !contains(github.event.head_commit.message, '#skip') }}
     steps:
       - uses: actions/checkout@v2
       - name: send telegram message on merge
@@ -25,20 +26,23 @@ jobs:
             Build started.
   deploy:
     runs-on: ubuntu-18.04
+    if: ${{ !contains(github.event.head_commit.message, '#skip') }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with: 
           node-version: '16.3.0'
-      - name: Compile frontend
+      - name: Compile frontend and run lint
         run: |
           cd frontend
           npm install
+          npm run lint
           cd ..
-      - name: Compile backend
+      - name: Compile backend and run lint
         run: |
           cd backend 
           npm install
+          npm run lint
           npm run build
           cd ..
       - name: Heroku login credentials

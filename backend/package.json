@@ -7,7 +7,9 @@
     "start": "node index.js",
     "watch": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf build && cd ../frontend && npm run build && cp -r build ../backend"
+    "build": "rm -rf build && cd ../frontend && npm run build && cp -r build ../backend",
+    "lint": "eslint .",
+    "format": "eslint . --fix"
   },
   "engines": {
     "node": "16.3.0"
@@ -31,6 +33,9 @@
     "uuid": "^3.3.3"
   },
   "devDependencies": {
+    "eslint": "^8.21.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
     "nodemon": "^1.19.4"
   }
 }

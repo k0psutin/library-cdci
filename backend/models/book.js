@@ -6,18 +6,17 @@ const bookSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    minlength: 2
+    minlength: 2,
   },
   published: {
-    type: Number
+    type: Number,
   },
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Author'
+    ref: 'Author',
   },
-  genres: [{ type: String }]
+  genres: [{ type: String }],
 })
 
 bookSchema.plugin(uniqueValidator)
-
 module.exports = mongoose.model('Book', bookSchema)

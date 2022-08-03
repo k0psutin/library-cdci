@@ -5,14 +5,13 @@ const authorSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minlength: 4
+    minlength: 4,
   },
   born: {
-    type: Number
+    type: Number,
   },
-  books: [{ type: String }]
+  books: [{ type: String }],
 })
 
 authorSchema.plugin(uniqueValidator)
-
 module.exports = mongoose.model('Author', authorSchema)

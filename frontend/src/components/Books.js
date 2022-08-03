@@ -18,7 +18,7 @@ const FIND_BOOK_BY_GENRE = gql`
   }
 `
 
-const Books = ({ client, show }) => {
+const Books = ({ show }) => {
   const [genres, setGenres] = useState([])
   const [filter, setFilter] = useState('')
 

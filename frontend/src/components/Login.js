@@ -1,29 +1,29 @@
 import React, { useState } from 'react'
 
-const Login = props => {
+const Login = ({ show, setToken, setPage, login }) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
   const handleLogin = async event => {
     event.preventDefault()
 
-    const result = await props.login({
+    const result = await login({
       variables: { username, password }
     })
 
     if (result) {
       const token = result.data.login.value
-      props.setToken(token)
+      setToken(token)
       localStorage.setItem('library-app-user-token', token)
     }
 
     setUsername('')
     setPassword('')
-    props.setPage('books')
+    setPage('books')
   }
 
   return (

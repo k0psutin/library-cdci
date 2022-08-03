@@ -5,7 +5,6 @@ const { execute, subscribe } = require('graphql')
 const { SubscriptionServer } = require('subscriptions-transport-ws')
 const express = require('express')
 const http = require('http')
-const cors = require('cors')
 
 const jwt = require('jsonwebtoken')
 
@@ -18,8 +17,7 @@ const resolvers = require('./resolvers')
 
 require('dotenv').config()
 
-const MONGODB_URI = process.env.MONGODB_URI
-const JWT_SECRET = process.env.JWT_SECRET
+const { MONGODB_URI, JWT_SECRET } = process.env
 const PORT = process.env.PORT || 4000
 
 mongoose
@@ -27,27 +25,14 @@ mongoose
     useFindAndModify: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
-    useNewUrlParser: true
+    useNewUrlParser: true,
   })
   .then(() => {
-    console.log(`connected to MongoDB`)
+    console.log('connected to MongoDB')
   })
-  .catch(error => {
-    console.log(`error connection to MONGODB:`, error.message)
+  .catch((error) => {
+    console.log('error connection to MONGODB:', error.message)
   })
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: async ({ req }) => {
-    const auth = req ? req.headers.authorization : null
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
-      const currentUser = await User.findById(decodedToken.id)
-      return { currentUser }
-    }
-  }
-})
 
 const startServer = async () => {
   const app = express()
@@ -56,15 +41,16 @@ const startServer = async () => {
   const schema = makeExecutableSchema({ typeDefs, resolvers })
 
   const subscriptionServer = SubscriptionServer.create(
-    { 
-      schema, 
-      execute, 
-      subscribe 
-    }, 
-    { 
-      server: httpServer, 
-      path: ''
-    })
+    {
+      schema,
+      execute,
+      subscribe,
+    },
+    {
+      server: httpServer,
+      path: '',
+    },
+  )
 
   const server = new ApolloServer({
     schema,
@@ -73,22 +59,23 @@ const startServer = async () => {
       if (auth && auth.toLowerCase().startsWith('bearer ')) {
         const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
         const currentUser = await User.findById(decodedToken.id).populate(
-          'friends'
+          'friends',
         )
         return { currentUser }
       }
+      return null
     },
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      {        
-        async serverWillStart() {          
-          return {            
-            async drainServer() {              
-              subscriptionServer.close()            
-            },          
-          }        
-        },      
-      },    
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              subscriptionServer.close()
+            },
+          }
+        },
+      },
     ],
   })
 
@@ -105,9 +92,7 @@ const startServer = async () => {
     res.send('ok')
   })
 
-  httpServer.listen(PORT, () =>
-    console.log(`Server is now running on http://localhost:${PORT}`)
-  )
+  httpServer.listen(PORT, () => console.log(`Server is now running on http://localhost:${PORT}`))
 }
 
 startServer()

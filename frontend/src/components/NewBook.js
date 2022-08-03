@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
 
-const NewBook = props => {
+const NewBook = ({ show, addBook }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [published, setPublished] = useState('')
   const [genre, setGenre] = useState('')
   const [genres, setGenres] = useState([])
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
   const submit = async e => {
     e.preventDefault()
-    await props.addBook({
+    await addBook({
       variables: {
         author,
         title,

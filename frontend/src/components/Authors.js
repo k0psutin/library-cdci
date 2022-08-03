@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
-const Authors = props => {
+const Authors = ({ show, editAuthor, authors }) => {
   const [id, setId] = useState('')
   const [born, setBorn] = useState('')
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
@@ -13,14 +13,14 @@ const Authors = props => {
     if (!id || !born) {
       return
     }
-    await props.editAuthor({
+    await editAuthor({
       variables: { id: id, setBornTo: parseInt(born) }
     })
     setId('')
     setBorn('')
   }
 
-  if (props.authors.loading) {
+  if (authors.loading) {
     return <div>loading..</div>
   } else {
     return (
@@ -33,7 +33,7 @@ const Authors = props => {
               <th>born</th>
               <th>books</th>
             </tr>
-            {props.authors.data.allAuthors.map(a => (
+            {authors.data.allAuthors.map(a => (
               <tr key={a.name}>
                 <td>{a.name}</td>
                 <td>{a.born}</td>
@@ -49,7 +49,7 @@ const Authors = props => {
               setId(target.value)
             }}>
               <option key={'default'} value={null} >select author</option>
-              {props.authors.data.allAuthors.map(a => {
+              {authors.data.allAuthors.map(a => {
                 return (
                   <option key={a.id} value={a.id}>
                     {a.name}

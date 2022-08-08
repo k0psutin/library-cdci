@@ -27,24 +27,28 @@ const Login = ({ show, setToken, setPage, login }) => {
   }
 
   return (
-    <div>
+    <div data-cy='loginpage'>
       <form onSubmit={handleLogin}>
-        <div>
+        <div data-cy='username'>
           username
           <input
+            id={'username-input'}
             value={username}
             onChange={({ target }) => setUsername(target.value)}
+            data-cy='username-input'
           />
         </div>
-        <div>
+        <div id='password' data-cy='password'>
           password
           <input
+            id={'password-input'}
             value={password}
             type='password'
+            data-cy='password-input'
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type='submit'>login</button>
+        <button type='submit' data-cy='login'>login</button>
       </form>
     </div>
   )

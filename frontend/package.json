@@ -20,7 +20,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint .",
-    "format": "eslint . --fix"
+    "format": "eslint . --fix",
+    "cypress:open": "cypress open --component",
+    "cypress:test": "cypress run --component"
   },
   "engines": {
     "node": "16.3.0"
@@ -38,6 +40,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^10.4.0",
     "eslint": "^5.16.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.30.1"

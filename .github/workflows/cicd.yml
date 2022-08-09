@@ -34,6 +34,7 @@ jobs:
           cd frontend
           npm install
           npm run lint
+          npm run cypress:test
           cd ..
       - name: Compile backend and run lint
         run: |
